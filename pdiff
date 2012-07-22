@@ -1,0 +1,70 @@
+#!/usr/bin/perl -w
+# A simple wrapper around "git-diff --patience" to support old-style 'diff'
+# output, mainly so "vimdiff" can use "patience diff".
+use strict;
+
+$|= 1;
+Main( @ARGV );
+exit;
+
+
+sub git2diff {
+    my( $in, $out ) = @_;
+    my $minus = 0;
+    while(  <$in>  ) {
+        next
+            if  /^(?:diff|index|---|\+\+\+)/;
+        if(  s/^-/< /  ) {
+            $minus = 1;
+        } elsif(  s/^\+/> /  ) {
+            print $out "---\n"
+                if  $minus;
+            $minus = 0;
+        } else {
+            $minus = '';
+        }
+        if(  '' ne $minus  ) {  # Is /^-/ or /^\+/...
+            ;                   # ...so do nothing more.
+        } elsif(  /^\@\@ -(\d+)(?:,(\d+))? \+(\d+)(?:,(\d+))? \@\@/  ) {
+            my( $oldOff, $oldLen, $newOff, $newLen ) = ( $1, $2, $3, $4 );
+            $oldLen = 1
+                if  ! defined $oldLen;
+            $newLen = 1
+                if  ! defined $newLen;
+            if(  ! $oldLen  ) {
+                $_ = sprintf "%da%d,%d\n", $oldOff,
+                    $newOff, $newOff+$newLen-1;
+                s/,\d+//
+                    if  1 == $newLen;
+            } elsif(  ! $newLen  ) {
+                $_ = sprintf "%d,%dd%d\n",
+                    $oldOff, $oldOff+$oldLen-1, $newOff;
+                s/,\d+//
+                    if  1 == $oldLen;
+            } else {
+                $_ = sprintf "%d,%dc%d,%d\n",
+                    $oldOff, $oldOff+$oldLen-1,
+                    $newOff, $newOff+$newLen-1;
+                s/,\d+c/c/
+                    if  1 == $oldLen;
+                s/,\d+$//
+                    if  1 == $newLen;
+            }
+        } else {
+            warn "Unknown line: $_";
+            next;
+        }
+        $minus ||= 0;
+        print $out $_;
+    }
+}
+
+
+sub Main {
+    my @args = @_;
+    open DIFF, '-|', 'git', 'diff', '-U0', '--patience', '--no-index', @args
+        or  die "Can't fork() to run git-diff: $!\n";
+    git2diff( \*DIFF, \*STDOUT );
+}
+
+__END__

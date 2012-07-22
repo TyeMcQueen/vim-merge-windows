@@ -1,0 +1,235 @@
+You may just want to read the README.markdown file.  The several examples
+near the end of that file are likely enough for you to understand how to
+use 95% of the features of the ":M" command without having to read these
+several pages of documentation.
+
+The below documentation describes in more detail how the behavior of those
+examples are constructed from a few simple building blocks of a handful of
+characters and a few ways of combining them.
+
+The vim ":M" command (added by vim-merge-windows.vim) takes a single
+argument composed of combinations of the following characters:
+
+    m   Refers to the Merged window. This holds the result to be saved and
+        where the merge conflict markers will be found.
+
+    l   Refers to the Local window. This holds the version of the file on this
+        branch from before the merge was attempted.
+
+    r   Refers to the Remote window.  This holds the version from the commit
+        that you are merging into your current branch.
+
+    b   Refers to the Base window.  This holds the version that is a common
+        ancestor to both the Local and Remote versions.  It is useful for
+        understanding the meaning of or the context of the conflicting
+        changes on either the Local or Remote side.
+
+    -   This indicates that you want to hide a window, so that it does not
+        appear on your screen.  It also turns off "diff" for that window
+        before hiding it so that you don't see changes relative to it being
+        highlighted in any of the still-visible windows.
+
+    +   This indicates that you want to see the window and have its contents
+        compared ('diff'ed) with one or more other versions.
+
+    =   This means that you want to see the window but do not want it
+        'diff'ed.  The window will be shown and the source code may try to
+        scroll in sync with the other windows (I'm still experimenting with
+        whether this is more beneficial or more of a hindrance).
+
+    1 2 3 4
+        These specify that you want a window positioned relative to the left
+        side of the screen.  1 indicates the far left side.  2 indicates the
+        window should be 2nd-from-the-left, etc.
+
+    6 7 8 9
+        These specify that you want a window positioned relative to the right
+        side of the screen.  9 indicates the far left side.  8 indicates the
+        window should be 2nd-from-the-right, etc.
+
+     5 0
+        These specify that you want to position another window so that it
+        is just to the left or just to the right of the current window.
+        Currently, this only works when making a currently-hidden window
+        re-appear.  '0' is the default and means that the window will be
+        added to the right of your current window.  '5' means that the
+        window will be added to the left of your current window (because
+        '0' is on the right side of your keyboard and '5 is to the left of
+        it).  If the window is already visible, then the '0' or '5' may
+        simply be ignored (this behavior is somewhat likely to change in
+        a future release).
+
+    M L R B
+        Uppercase versions of the letters refer to the same window but
+        indicate a "less common" configuration choice.  There are two
+        different meanings for the letter being uppercase, depending on
+        which form of argument they are used in.  These are documented
+        under the argument forms below.
+
+The above characters can be combined in several ways to specify a large
+number of possible configuration changes to the layout of your merge
+windows.
+
+    :M mlbr
+        If the argument consists of 2 or more lowercase letters, then the
+        argument lists all of the windows that you want to show, in the order
+        that they should appear on the screen (from left to right).  All
+        windows will be 'diff'ed against the others.
+
+    :M MlbR
+        If the argument consists of 2 or more letters, some of which are
+        uppercase, then it means the same as the lowercase equivalent (above)
+        except that the windows designated by uppercase letters should not
+        be 'diff'ed.  If all of the letters are uppercase, then none of the
+        contents are 'diff'ed.
+
+    :M m
+        Giving a single lowercase letter as the argument to the ":M" command
+        moves your cursor into the specified window.  If the window is
+        currently hidden, then the window will be shown (and likely be
+        'diff'ed, though one day it may depend on whether it was being
+        'diff'ed the last time it was shown).  The window will appear to
+        the right of whatever window you are currently in (but one day may
+        appear in the position that it was most recently shown in).
+
+    :M  Giving no argument simply shows (in the status line) the current
+        arrangement of the merge windows using up to 4 letters, similar to
+        the argument you would pass (as described above) in order to specify
+        that configuration.  The window where the cursor is currently located
+        is highlighted by being surrounded by parentheses.
+
+        So, if you entered the commands ":M Mlb", ":M b", ":M", then the
+        status line would indicate "Ml(b)".
+
+        Most other commands also end by displaying the new window arrangement
+        in the status line.  But the ":M" command with no arguments is a good
+        way to re-display that information without making any changes to the
+        current arrangement.
+
+    :M M
+        Giving a single uppercase letter as the argument to the ":M" command
+        causes *only* the specified window to be displayed.  Naturally, it is
+        not 'diff'ed against any of the hidden windows.
+
+    :M 9
+        Giving a single digit to the ":M" command indicates that you want to
+        move the current window.  See above for the meaning of each digit.
+
+    :M b8
+        You can combine a single lowercase letter with a following digit to
+        specify a specific window to be moved.  Whether or not the window
+        is 'diff'ing will not be changed, but the window will be unhidden
+        if required.
+
+    :M -
+        A single punctuation mark specifies that you want to change the
+        appearance of the current window (hiding it or turning on or off
+        whether or not it is 'diff'ed).
+
+    :M +lr=m9b
+        You can give one or more sequences of a punctuation character
+        followed by one or more lowercase letters (each of which can be
+        followed by upto one digit).  The meaning should be easy to
+        predict from the previous argument formats.  ":M +lr=m9b" is the
+        same as doing ":M +lr" followed by ":M =m9b".  ":M =m9b" is the
+        same as doing ":M =m9" followed by ":M =b".  ":M =m9" is the
+        same as doing ":M m", ":M =", and then ":M 9".
+
+Yet to be implemented:
+
+    :M =2
+        You can't yet combine just a punctuation mark and a digit.  But in
+        a future release, this will both change the 'diff' status of the
+        current window and change its position.
+
+    *   This will mean that you want to 'diff' a visible window against this
+        window while still hiding this window.  It is a bit of an unusual
+        choice but can sometimes be useful when looking at wide lines of
+        code on a narrow screen, for example.
+
+    When something like ":M -b" hides a specific window, your cursor should
+    be left in the same window it started in.  Currently, your cursor will
+    be left in a window that was adjacent to the window that you hid.
+
+The first time the :M command is run causes information about the visible
+windows to be queried in order to map each window to one of the four window
+roles (Merged, Local, Remote, or Base).  This information is cached (in
+variables localized to the current 'tab page') so that a subsequent ":M"
+command can hide, unhide, or move these windows without being confused by
+other windows that you have opened (such as a ":help" window).
+
+Currently, the role of a window is determined using a very simple matching
+against the name of the file being viewed in that window.  For example, if
+the window is for a buffer tied to a file named
+
+    lib/Awesome/Hack.BASE.3183.pm
+
+then the window will be recognized as the Base window.
+
+The buffer name (file path) is compared to the following vim regex:
+
+    \v[.]([A-Z])[A-Z]*[.]\d+[.]?[^.]*$
+
+Which matches:
+
+    [.]
+        A literal period character
+    ([A-Z])[A-Z]*
+        One or more uppercase ASCII letters, the first of which is remembered
+    [.]
+        Another literal period character
+    \d+
+        One or more digits
+    [.]?[^.]*
+        An optional "file extension" such as ".pm"
+    $
+        The end of the string
+
+This was chosen to match the file names that git-mergetool uses.
+
+The remembered first uppercase ASCII letter is what is used to refer to that
+window from then on (though usually using the lowercase version of it).  The
+letter doesn't even have to be 'm', 'l', 'r', or 'b'.  You could use the :M
+command on even more than 4 windows using any letters if the file names each
+match the above pattern.
+
+If a buffer name does not match the above regex, then the window is assigned
+to the 'm' character.
+
+If two windows end up being assigned to the same letter, then the ":M" command
+will refuse to function.
+
+If you want to use the :M command on a set of windows that won't be handled
+by the above simple matching, then you can just pre-declare the mapping
+between letters and vim buffer numbers yourself.  For example, if you have 4
+windows that you want to manipulate using :M, then just assign a four-letter
+string to the t:mergeBufLets variable and a list of 4 buffer numbers to the
+t:mergeBufNums variable:
+
+    :let t:mergeBufLets = "fotp"
+    :let t:mergeBufNums = [ 1, 2, 3, 4 ]
+
+A future release will also allow you to skip setting t:mergeBufNums (just
+set t:mergeBufLets), in which case it will just use the buffer numbers from
+the currently visible windows.
+
+Note that you don't have to use the ":M" command.  You can just call the
+MergeWindow() function directly.  Doing so will give you a couple of extra
+features that may sometimes be useful.
+
+First, you can specify a second argument of "1" to MergeWindows() to
+indicate that the status line should not be updated with the current
+window arrangement information.  This can be important if you want to
+call MergeWindows() more than once at a time.  For example, you could
+call MergeWindows('',1) to initialize the configuration without making
+any screen updates.
+
+Second, the return value from MergeWindows() is the empty string if the
+operation was successful.  If something failed, then a short, mnemonic
+string is returned to indicate what type of error was encountered.  A
+descriptive error message is also displayed on the status line.  To see
+what error codes can be returned, simply view the function's source code.
+
+The current version just fails if you specify a letter that doesn't map to
+any of the configured buffer numbers (it doesn't return a string indicating
+that the letter wasn't recognized).

@@ -1,0 +1,58 @@
+To use "patience diff" inside vimdiff:
+
+     1) Install git and perl from your favorite sources.
+
+     2) Install the pdiff script.  For example:
+
+            mv pdiff $HOME/bin/.
+
+        or:
+
+            ln -s $HOME/bin/pdiff .
+
+        The above options assume several things like:
+
+            You are on a sufficiently Unix-like system.
+            $HOME/bin is in your $PATH.
+            You have cd'ed into the vim-merge-windows repository.
+
+        If you have successfully installed pdiff, then the following
+        commands should produce output similar to that shown:
+
+             $ which pdiff
+            /home/awesomehacker/bin/pdiff
+             $ pdiff
+            usage: git diff --no-index <path> <path>
+             $
+
+     3) Load patience-diff.vim from your $HOME/.vimrc (or similar) file.
+        For example, add the following line to that file:
+
+            :source ~/src/vim-merge-windows/patience-diff.vim
+
+        But use the actual path where you put this repo, of course.
+
+
+To use the :M command in vimdiff to easily manipulate window
+arrangement when resolving a merge conflict:
+
+     1) Load vim-merge-windows.vim from your $HOME/.vimrc (or similar) file.
+        For example, add the following line to that file:
+
+            :source ~/src/vim-merge-windows/vim-merge-windows.vim
+
+        But use the actual path where you put this repo, of course.
+
+     2) Configure git to add the +:M argument to how you launch vimdiff
+        from git-mergetool.  For example:
+
+            [merge]
+                tool = gvd4
+            [mergetool "gvd4"]
+                cmd = gvim -d +M: $MERGED $LOCAL $BASE $REMOTE
+            [mergetool "gvd3"]
+                cmd = gvim -d +M: $MERGED $LOCAL $REMOTE
+            [mergetool "vd4"]
+                cmd = vim -d +M: $MERGED $LOCAL $BASE $REMOTE
+            [mergetool "vd3"]
+                cmd = vim -d +M: $MERGED $LOCAL $REMOTE
