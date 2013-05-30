@@ -8,7 +8,7 @@ To use "patience diff" inside vimdiff:
 
         or:
 
-            ln -s $HOME/bin/pdiff .
+            ln -s `pwd`/pdiff $HOME/bin
 
         The above options assume several things like:
 
