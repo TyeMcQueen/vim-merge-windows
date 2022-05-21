@@ -17,7 +17,7 @@ function! MergeWindows( ... )
         let l:win = winnr() | windo
         \   let t:mergeBufNums += [ bufnr('%') ]
         \|  let l:f = bufname('%')
-        \|  let l:p = match( l:f, '\v[.]([A-Z])[A-Z]*[.]\d+[.]?[^.]*$' )
+        \|  let l:p = match( l:f, '\v[._]([A-Z])[A-Z]*[._]\d+[.]?[^.]*$' )
         \|  if -1 == l:p
         \|      let l:l = 'm'
         \|  else
