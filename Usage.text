@@ -164,22 +164,22 @@ Currently, the role of a window is determined using a very simple matching
 against the name of the file being viewed in that window.  For example, if
 the window is for a buffer tied to a file named
 
-    lib/Awesome/Hack.BASE.3183.pm
+    lib/Awesome/Hack_BASE_3183.pm
 
 then the window will be recognized as the Base window.
 
 The buffer name (file path) is compared to the following vim regex:
 
-    \v[.]([A-Z])[A-Z]*[.]\d+[.]?[^.]*$
+    \v[._]([A-Z])[A-Z]*[._]\d+[.]?[^.]*$
 
 Which matches:
 
-    [.]
-        A literal period character
+    [._]
+        Either a literal period character or underscore character
     ([A-Z])[A-Z]*
         One or more uppercase ASCII letters, the first of which is remembered
-    [.]
-        Another literal period character
+    [._]
+        Another literal period character or underscore character
     \d+
         One or more digits
     [.]?[^.]*
