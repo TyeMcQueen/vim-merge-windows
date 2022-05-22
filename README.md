@@ -60,3 +60,5 @@ See Also
 See [INSTALL](INSTALL.text) for installation instructions.
 
 See [Usage](Usage.text) for more details about using ":M".
+
+See [Merging](Merging.md) for more techniques for resolving merge conflicts.
