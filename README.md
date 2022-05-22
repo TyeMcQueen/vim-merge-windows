@@ -53,6 +53,8 @@ A short sample of things you can do with the :M command:
     :M 8        # Move the current window to be 2nd-from-the-right
     :M +m9      # Move/show Merged to be at the far right, turning on 'diff'
     :M -b+m2r9  # Do ":M -b", ":M +m2", and ":M +r9"
+    :M .        # Re-initialize the letters to use based on current windows.
+    :M .abcD    # Reset to use abcd for 4 current windows, diff all but last.
 
 See Also
 =

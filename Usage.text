@@ -67,6 +67,9 @@ argument composed of combinations of the following characters:
         which form of argument they are used in.  These are documented
         under the argument forms below.
 
+    .   A leading '.' character causes a (re)initialization of what
+        letters to use for the currently visible buffers.
+
 The above characters can be combined in several ways to specify a large
 number of possible configuration changes to the layout of your merge
 windows.
@@ -142,6 +145,22 @@ windows.
         it will likely end up in a window that had been adjacent to
         the last window to be hidden).
 
+    :M .
+        Just (re)initialize what letters to use for the current windows
+        based on the file names as described below (same as is done
+        automatically when :M is used for the first time).
+
+    :M .abCd
+        A period followed by 2 or more letters resets which letters are
+        used to refer to the currently visible buffers.  The first letter
+        will then refer to the buffer shown in the left-most window, etc.
+        For any buffers where a lowercase letter was given (after the ".")
+        'diff' will be enabled.  Any buffers where an uppercase letter
+        was given will have 'diff' disabled.  If you specify more or fewer
+        letters than you have current windows, then the extra letters or
+        windows are ignored.  Any letters previously associated with buffers
+        will be forgotten.
+
 Yet to be implemented:
 
     :M =2
@@ -154,8 +173,8 @@ Yet to be implemented:
         choice but can sometimes be useful when looking at wide lines of
         code on a narrow screen, for example.
 
-The first time the :M command is run causes information
-about the visible windows to be queried in order to map each buffer to one of
+The first time the :M command is run (or when ":M ." is entered), information
+about the visible buffers is queried in order to map each buffer to one of
 the four roles (Merged, Local, Remote, or Base).  This information is cached
 (in variables localized to the current 'tab page') so that a subsequent ":M"
 command can hide, unhide, or move these windows without being confused by
@@ -200,21 +219,11 @@ If a buffer name does not match the above regex, then the window is assigned
 to the 'm' character.
 
 If two windows end up being assigned to the same letter, then the ":M" command
-will refuse to function.
+will not fully function.
 
-If you want to use the :M command on a set of windows that won't be handled
-by the above simple matching, then you can just pre-declare the mapping
-between letters and vim buffer numbers yourself.  For example, if you have 4
-windows that you want to manipulate using :M, then just assign a four-letter
-string to the t:mergeBufLets variable and a list of 4 buffer numbers to the
-t:mergeBufNums variable:
-
-    :let t:mergeBufLets = "fotp"
-    :let t:mergeBufNums = [ 1, 2, 3, 4 ]
-
-A future release will also allow you to skip setting t:mergeBufNums (just
-set t:mergeBufLets), in which case it will just use the buffer numbers from
-the currently visible windows.
+You can use the :M command on a set of windows that won't be handled by the
+above simple file path matching.  Just enter a command like ":M .abcde",
+which associates the listed letters with each visible buffer, in order.
 
 Note that you don't have to use the ":M" command.  You can just call the
 MergeWindow() function directly.  Doing so will give you a couple of extra

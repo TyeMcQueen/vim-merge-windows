@@ -6,29 +6,44 @@ function! MergeWindows( ... )
     let l:quiet =  1 < a:0  ?  a:2  :  0
     let l:buf = bufnr('%') " The buffer to leave cursor in when done.
     let l:bufs = { }
-    if  ! exists("t:mergeBufNums")  ||  '.' == l:spec
-        redraw | redraws
-        "
-        " Figure out which buffers hold Merged, Local, Remote, and Base:
+    if  ! exists("t:mergeBufNums")  ||  l:spec =~ '\v^[.]([a-zA-Z]{2,})?$'
+        " Set which letters to use for each of the current windows.
         " let t:mergeBufNums = [ 1, 2, 3, 4 ]
         " let t:mergeBufLets = "mlbr"
         let t:mergeBufNums = [ ]
         let t:mergeBufLets = ""
+        let l:seq = 0
         let l:win = winnr() | windo
-        \   let t:mergeBufNums += [ bufnr('%') ]
-        \|  let l:f = bufname('%')
-        \|  let l:p = match( l:f, '\v[._]([A-Z])[A-Z]*[._]\d+[.]?[^.]*$' )
-        \|  if -1 == l:p
-        \|      let l:l = 'm'
+        \   if 2 < len(l:spec)
+        \|      let l:seq += 1
+        \|      let l:l = tolower(l:spec[l:seq])
+        \|      if '' == l:l
+        \|          echoerr "Too few letters given."
+        \|          return 'FewerLetters'
+        \|      endif
         \|  else
-        \|      let l:l = tolower( l:f[ 1 + l:p ] )
+        \|      let l:f = bufname('%')
+        \|      let l:p = match( l:f, '\v[._]([A-Z])[A-Z]*[._]\d+[.]?[^.]*$' )
+        \|      if -1 == l:p
+        \|          let l:l = 'm'
+        \|      else
+        \|          let l:l = tolower( l:f[ 1 + l:p ] )
+        \|      endif
         \|  endif
         \|  if has_key( l:bufs, l:l )
         \|      let l:bn = bufname( l:bufs[l:l] )
-        \|      echoerr "Two merge" l:l "buffers:" l:bn "and" bufname('%')
-        \|      return 'BadWins'
+        \|      echoerr "Used same letter (" l:l ") for:" l:bn "and" bufname('%')
+        \|      return 'DupLetter'
+        \|  endif
+        \|  if 2 < len(l:spec)
+        \|      if l:l == l:spec[l:seq]
+        \|          diffthis
+        \|      else
+        \|          set nodiff
+        \|      endif
         \|  endif
         \|  let l:bn = bufnr('%')
+        \|  let t:mergeBufNums += [ l:bn ]
         \|  let t:mergeBufLets .= l:l
         \|  let l:bufs[ l:l ] = l:bn
         \|  let l:bufs[ l:bn ] = l:l
@@ -41,8 +56,8 @@ function! MergeWindows( ... )
             let l:i += 1
         endwhile
     endif
-    if '.' == l:spec | return '' | endif
-    if '' == l:spec
+    if  '' == l:spec  ||  '.' == l:spec[0]
+        let l:spec = ''
         if l:quiet | return '' | endif
         let l:win = winnr() | windo
         \   let l:bn = bufnr('%')
@@ -53,7 +68,7 @@ function! MergeWindows( ... )
         \|      let l:spec .= l:l
         \|  endif
         exec l:win "wincmd w"
-        echo "'Merge' window state:" l:spec
+        redraws | echo "'Merge' window state:" l:spec
         return ''
     endif
     "
@@ -211,3 +226,5 @@ endfunction
 " [-+=]             # Hide, diff, nodiff current window
 " ([-+=][mlbr]+)+   # Hide, diff, nodiff listed windows
 " [mlbrMLBR]{2,4}   # Position and set all windows (upper case: nodiff)
+" .                 # Resets letters for current windows
+" .[a-zA-Z]{2,}     # Sets letters for current windows, diffs lowercase
