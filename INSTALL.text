@@ -32,7 +32,6 @@ To use "patience diff" inside vimdiff:
 
         But use the actual path where you put this repo, of course.
 
-
 To use the :M command in vimdiff to easily manipulate window
 arrangement when resolving a merge conflict:
 
