@@ -137,6 +137,11 @@ windows.
         same as doing ":M =m9" followed by ":M =b".  ":M =m9" is the
         same as doing ":M m", ":M =", and then ":M 9".
 
+        At the end, your cursor should be left in the same buffer it
+        started in, unless that buffer ended up hidden (in which case
+        it will likely end up in a window that had been adjacent to
+        the last window to be hidden).
+
 Yet to be implemented:
 
     :M =2
@@ -148,10 +153,6 @@ Yet to be implemented:
         buffer while still hiding this buffer.  It is a bit of an unusual
         choice but can sometimes be useful when looking at wide lines of
         code on a narrow screen, for example.
-
-    When something like ":M -b" hides a specific buffer, your cursor should
-    be left in the same window it started in.  Currently, your cursor will
-    be left in a window that was adjacent to the window that you hid.
 
 The first time the :M command is run causes information
 about the visible windows to be queried in order to map each buffer to one of

@@ -90,24 +90,24 @@ function! MergeWindows( ... )
     "
     " Adjust listed windows:
     if l:spec =~ '^[-+=]'
-        let l:want = 'op' | let l:buf = ''
+        let l:want = 'op' | let l:sub = ''
         for l:c in split( l:spec, '\zs' ) + [ '' ]
-            if  '' != l:buf  &&  l:c !~ '[0-9]'
-                call MergeWindows( l:buf[0], 1 ) | call MergeWindows( l:op, 1 )
-                if  2 == len(l:buf)  &&  '-' != l:op
-                    call MergeWindows( l:buf[1], 1 )
+            if  '' != l:sub  &&  l:c !~ '[0-9]'
+                call MergeWindows( l:sub[0], 1 ) | call MergeWindows( l:op, 1 )
+                if  2 == len(l:sub)  &&  '-' != l:op
+                    call MergeWindows( l:sub[1], 1 )
                 endif
-                let l:buf = ''
+                let l:sub = ''
             endif
             if l:c =~ '[-+=]'
                 let l:got = 'op' | let l:next = 'buf'
                 let l:op = l:c
             elseif l:c =~ '[a-z]'
                 let l:got = 'buf' | let l:next = 'op,buf,pos,end'
-                let l:buf = l:c
+                let l:sub = l:c
             elseif l:c =~ '[1-46-9]'
                 let l:got = 'pos' | let l:next = 'op,buf,end'
-                let l:buf .= l:c
+                let l:sub .= l:c
             elseif l:c == ''
                 let l:got = 'end' | let l:next = ''
             else
@@ -120,6 +120,8 @@ function! MergeWindows( ... )
             endif
             let l:want = l:next
         endfor
+        let l:win = bufwinnr(l:buf)
+        if -1 != l:win | exec l:win "wincmd w" | endif
         return MergeWindows( '', l:quiet )
     endif
     "
