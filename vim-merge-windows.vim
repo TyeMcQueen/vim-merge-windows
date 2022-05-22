@@ -24,13 +24,14 @@ function! MergeWindows( ... )
         \|      let l:l = tolower( l:f[ 1 + l:p ] )
         \|  endif
         \|  if has_key( l:bufs, l:l )
-        \|      let l:b = bufname( l:bufs[l:l] )
-        \|      echoerr "Two merge" l:l "buffers:" l:b "and" bufname('%')
+        \|      let l:bn = bufname( l:bufs[l:l] )
+        \|      echoerr "Two merge" l:l "buffers:" l:bn "and" bufname('%')
         \|      return 'BadWins'
         \|  endif
+        \|  let l:bn = bufnr('%')
         \|  let t:mergeBufLets .= l:l
-        \|  let l:bufs[ l:l ] = bufnr('%')
-        \|  let l:bufs[ bufnr('%') ] = l:l
+        \|  let l:bufs[ l:l ] = l:bn
+        \|  let l:bufs[ l:bn ] = l:l
         exec l:win "wincmd w"
     else
         let l:i = 0
@@ -44,9 +45,9 @@ function! MergeWindows( ... )
     if '' == l:spec
         if l:quiet | return '' | endif
         let l:win = winnr() | windo
-        \   let l:b = bufnr('%')
-        \|  if has_key( l:bufs, l:b )
-        \|      let l:l = l:bufs[ l:b ]
+        \   let l:bn = bufnr('%')
+        \|  if has_key( l:bufs, l:bn )
+        \|      let l:l = l:bufs[ l:bn ]
         \|      if ! &diff | let l:l = toupper(l:l) | endif
         \|      if l:win == winnr() | let l:l = '('.l:l.')' | endif
         \|      let l:spec .= l:l
@@ -72,14 +73,14 @@ function! MergeWindows( ... )
     if l:spec =~# '\v^[a-z][0-9]?$'
         let l:l = l:spec[0]
         let l:pos = l:spec[1]
-        let l:b = l:bufs[l:l]
-        let l:w = bufwinnr(l:b)
+        let l:bn = l:bufs[l:l]
+        let l:w = bufwinnr(l:bn)
         if -1 != l:w
             exec l:w "wincmd w"
         else
             wincmd v
             if '5' != l:pos | exec 'wincmd l' | endif
-            exec "buf" l:b
+            exec "buf" l:bn
             let l:w = winnr()
         endif
         if l:pos =~ '\v^[05]?$' | return MergeWindows('',l:quiet) | endif
@@ -130,23 +131,23 @@ function! MergeWindows( ... )
         "
         " Make sure desired windows are showing:
         for l:l in split( l:spec, '\zs' )
-            let l:b = l:bufs[ tolower(l:l) ]
-            let l:w = bufwinnr(l:b)
+            let l:bn = l:bufs[ tolower(l:l) ]
+            let l:w = bufwinnr(l:bn)
             if -1 == l:w
                 wincmd v
-                exec "buf" l:b
+                exec "buf" l:bn
             endif
         endfor
         "
         " Hide undesired windows and en/disable 'diff'
         wincmd t
         while 1
-            let l:b = bufnr('%')
-            if ! has_key( l:bufs, l:b )
+            let l:bn = bufnr('%')
+            if ! has_key( l:bufs, l:bn )
                 wincmd w
                 if 1 == winnr() | break | endif
             else
-                let l:l = l:bufs[l:b]
+                let l:l = l:bufs[l:bn]
                 if l:spec !~? l:l
                     let l:l = winnr()
                     set nodiff | hide
@@ -169,8 +170,8 @@ function! MergeWindows( ... )
     " Get numbers of windows we control:
     let l:wins = [ ]
     windo
-    \   let l:b = bufnr('%')
-    \|  if has_key( l:bufs, l:b ) | let l:wins += [ winnr() ] | endif
+    \   let l:bn = bufnr('%')
+    \|  if has_key( l:bufs, l:bn ) | let l:wins += [ winnr() ] | endif
     "
     if l:spec =~ '^[1-46-9]$'
         let l:spec -= 1
@@ -189,8 +190,8 @@ function! MergeWindows( ... )
     "
     " Put windows in proper order:
     for l:l in split( l:spec, '\zs' )
-        let l:b = l:bufs[ tolower(l:l) ]
-        let l:w = bufwinnr( l:b )
+        let l:bn = l:bufs[ tolower(l:l) ]
+        let l:w = bufwinnr( l:bn )
         let l:n = remove( l:wins, 0 )
         if l:w != l:n
             exec l:w "wincmd w"
