@@ -5,7 +5,7 @@ When using "vimdiff" to resolve a merge conflict, vim-merge-windows makes
 it trivial to control the presentation of the windows for the different
 instances of the conflicted file (the Merged end result, the Local version,
 the Remote version, and the Base version of the file).  That is, you can
-pick which windows to show, in what order, and which ones are being 'diff'ed
+pick which buffers to show, in what order, and which ones are being 'diff'ed
 and quickly change between arrangements.
 
 vim-merge-windows also includes a small Perl script, pdiff, that allows
@@ -42,21 +42,21 @@ A short sample of things you can do with the :M command:
 
     :M mlbr     # Show Merged, Local, Base, Remote in that order
     :M lb       # Show just Local and Base, diff'ing them
-    :M Mrb      # Show Merge, Local, Base but only diff'ing Local, Base
-    :M b        # Jump to the Base window (making it appear, if hidden)
-    :M M        # Show only Merged
+    :M Mrb      # Show Merge, Remote, Base but only diff'ing Remote, Base
+    :M b        # Just move cursor to Base buffer (making it appear, if hidden)
+    :M L        # Show only the Local buffer
     :M -        # Hide the current window
     :M =        # Turn off "diff" for the current window
     :M +        # Turn on "diff" for the current window
-    :M -b       # Hide the Base window
-    :M 9        # Move the current window to the far right
-    :M 2        # Move the current window to 2nd-from-the-left
-    :M +m8      # Move/show Merged to be 2nd-from-right, turning on 'diff'
+    :M -b       # Hide the Base buffer
+    :M 2        # Move the current window to be 2nd-from-the-left
+    :M 8        # Move the current window to be 2nd-from-the-right
+    :M +m9      # Move/show Merged to be at the far right, turning on 'diff'
     :M -b+m2r9  # Do ":M -b", ":M +m2", and ":M +r9"
 
 See Also
 =
 
-See INSTALL.text for installation instructions.
+See [INSTALL](INSTALL.text) for installation instructions.
 
-See Usage.text for more details about vim-merge-windows.
+See [Usage](Usage.text) for more details about using ":M".

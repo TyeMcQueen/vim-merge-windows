@@ -4,7 +4,7 @@ com! -nargs=? M call MergeWindows( <f-args> )
 function! MergeWindows( ... )
     let l:spec = '' | if a:0 | let l:spec = a:1 | endif
     let l:quiet =  1 < a:0  ?  a:2  :  0
-    let l:buf = bufnr('%')
+    let l:buf = bufnr('%') " The buffer to leave cursor in when done.
     let l:bufs = { }
     if  ! exists("t:mergeBufNums")  ||  '.' == l:spec
         redraw | redraws
@@ -195,7 +195,7 @@ function! MergeWindows( ... )
             exec l:n "wincmd x"
         endif
     endfor
-    wincmd =
+    wincmd = " Make all current windows equal width
     let l:win = bufwinnr(l:buf)
     if -1 != l:win | exec l:win "wincmd w" | endif
     redraw

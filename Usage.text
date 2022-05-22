@@ -1,4 +1,4 @@
-You may just want to read the README.md file.  The several
+You may just want to read the [README.md](README.md) file.  The several
 examples near the end of that file are likely enough for you to understand
 how to use 95% of the features of the ":M" command without having to read
 these several pages of documentation.
@@ -10,30 +10,30 @@ characters and a few ways of combining them.
 The vim ":M" command (added by vim-merge-windows.vim) takes a single
 argument composed of combinations of the following characters:
 
-    m   Refers to the Merged window. This holds the result to be saved and
+    m   Refers to the Merged buffer. This holds the result to be saved and
         where the merge conflict markers will be found.
 
-    l   Refers to the Local window. This holds the version of the file on
+    l   Refers to the Local buffer. This holds the version of the file on
         this branch from before the merge was attempted.
 
-    r   Refers to the Remote window.  This holds the version from the commit
+    r   Refers to the Remote buffer.  This holds the version from the commit
         that you are merging into your current branch.
 
-    b   Refers to the Base window.  This holds the version that is a common
+    b   Refers to the Base buffer.  This holds the version that is a common
         ancestor to both the Local and Remote versions.  It is useful for
         understanding the meaning of or the context of the conflicting
         changes on either the Local or Remote side.
 
     -   This indicates that you want to hide a window, so that it does not
-        appear on your screen.  It also turns off "diff" for that window
+        appear on your screen.  It also turns off "diff" for that buffer
         before hiding it so that you don't see changes relative to it being
         highlighted in any of the still-visible windows.
 
-    +   This indicates that you want to see the window and have its contents
+    +   This indicates that you want to see the buffer and have its contents
         compared ('diff'ed) with one or more other versions.
 
-    =   This means that you want to see the window but do not want it
-        'diff'ed.  The window will be shown and the
+    =   This means that you want to see the buffer but do not want it
+        'diff'ed.  A window containing the buffer will be shown and the
         source code may try to scroll in sync with the other windows (I'm
         still experimenting with whether this is more beneficial or more
         of a hindrance).
@@ -45,7 +45,7 @@ argument composed of combinations of the following characters:
 
     6 7 8 9
         These specify that you want a window positioned relative to the right
-        side of the screen.  9 indicates the far left side.  8 indicates the
+        side of the screen.  9 indicates the far right side.  8 indicates the
         window should be 2nd-from-the-right, etc.
 
     5 0
@@ -55,13 +55,13 @@ argument composed of combinations of the following characters:
         re-appear.  '0' is the default and means that the window will be
         added to the right of your current window.  '5' means that the
         window will be added to the left of your current window (because
-        '0' is on the right side of your keyboard and '5 is to the left
+        '0' is on the right side of your keyboard and '5' is to the left
         of it).  If the window is already visible, then the '0' or '5' may
         simply be ignored (this behavior is somewhat likely to change in
         a future release).
 
     M L R B
-        Uppercase versions of the letters refer to the same window but
+        Uppercase versions of the letters refer to the same buffer but
         indicate a "less common" configuration choice.  There are two
         different meanings for the letter being uppercase, depending on
         which form of argument they are used in.  These are documented
@@ -73,14 +73,14 @@ windows.
 
     :M mlbr
         If the argument consists of 2 or more lowercase letters, then the
-        argument lists all of the windows that you want to show, in the
+        argument lists all of the buffers that you want to show, in the
         order that they should appear on the screen (from left to right).
-        All windows will be 'diff'ed against the others.
+        All of the resulting windows will be 'diff'ed against each other.
 
     :M MlbR
         If the argument consists of 2 or more letters, some of which are
         uppercase, then it means the same as the lowercase equivalent
-        (above) except that the windows designated by uppercase letters
+        (above) except that the buffers designated by uppercase letters
         should not be 'diff'ed.  If all of the letters are uppercase,
         then none of the contents are 'diff'ed.
 
@@ -89,7 +89,7 @@ windows.
         command moves your cursor into the specified window.  If the window
         is currently hidden, then the window will be shown (and likely be
         'diff'ed, though one day it may depend on whether it was being
-        'diff'ed the last time it was shown).  The window
+        'diff'ed the last time it was shown).  In that case, the window
         will appear to the right of whatever window you are currently in
         (but one day may appear in the position that it was most recently
         shown in).
@@ -108,10 +108,10 @@ windows.
         way to re-display that information without making any changes to the
         current arrangement.
 
-    :M M
+    :M B
         Giving a single uppercase letter as the argument to the ":M" command
-        causes *only* the specified window to be displayed.  Naturally, it is
-        not 'diff'ed against any of the hidden windows.
+        causes *only* the specified buffer to be displayed.  Naturally, it is
+        not 'diff'ed against any of the hidden buffers.
 
     :M 9
         Giving a single digit to the ":M" command indicates that you want to
@@ -120,8 +120,8 @@ windows.
     :M b8
         You can combine a single lowercase letter with a following digit to
         specify a specific window to be moved.  Whether or not the window
-        is 'diff'ing will not be changed, but the window will be unhidden
-        if required.
+        is 'diff'ing will not be changed, but the buffer will be unhidden
+        by creating a new window if required.
 
     :M -
         A single punctuation mark specifies that you want to change the
@@ -144,18 +144,18 @@ Yet to be implemented:
         a future release, this will both change the 'diff' status of the
         current window and change its position.
 
-    *   This will mean that you want to 'diff' a visible window against this
-        window while still hiding this window.  It is a bit of an unusual
+    *   This will mean that you want to 'diff' other buffers against this
+        buffer while still hiding this buffer.  It is a bit of an unusual
         choice but can sometimes be useful when looking at wide lines of
         code on a narrow screen, for example.
 
-    When something like ":M -b" hides a specific window, your cursor should
+    When something like ":M -b" hides a specific buffer, your cursor should
     be left in the same window it started in.  Currently, your cursor will
     be left in a window that was adjacent to the window that you hid.
 
 The first time the :M command is run causes information
-about the visible windows to be queried in order to map each window to one of
-the four window roles (Merged, Local, Remote, or Base).  This information is cached
+about the visible windows to be queried in order to map each buffer to one of
+the four roles (Merged, Local, Remote, or Base).  This information is cached
 (in variables localized to the current 'tab page') so that a subsequent ":M"
 command can hide, unhide, or move these windows without being confused by
 other windows that you have opened (such as a ":help" window).
